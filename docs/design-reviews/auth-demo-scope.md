@@ -26,9 +26,10 @@
 
 **Server Action은 공개 HTTP 엔드포인트다.** 화면에 버튼이 없어도 액션 ID를 아는 사람은 POST를 보낼 수 있다. Vercel 배포 URL은 공개이고 검색에 노출될 수 있다. 방치하면 데모 데이터가 삭제되거나 쓰레기 데이터가 들어온다.
 
-- **Vercel Deployment Protection(Vercel Authentication)을 Preview와 Production 모두에 켠다.** 플랫폼 레벨 게이트라 애플리케이션 코드가 필요 없다.
+- **`apps/web`은 Preview 배포만 쓴다.** Hobby 플랜은 Production에 Vercel Authentication을 걸 수 없다. `kpi-web`에 Ignored Build Step(`if [ "$VERCEL_ENV" = "production" ]; then exit 0; else exit 1; fi`)을 걸어 production 빌드를 건너뛰고, 게이트가 붙는 Preview URL로 데모를 연다.
+- **`apps/api`에는 걸지 않는다.** 걸면 web의 서버 호출(BFF)이 막혀 앱이 죽는다. 방어선은 `x-api-key`다([frontend-backend-split.md](frontend-backend-split.md)).
 - `robots.txt`와 `noindex`로 검색 노출을 막는다.
-- 이 두 가지가 데모 목적의 보호 수단이다. 배포 체크리스트에 넣는다.
+- 이것이 데모 목적의 보호 수단이다. 배포 체크리스트에 넣는다.
 
 ### 2. 실제 인사평가 **결과**를 넣지 않는다
 
@@ -59,7 +60,7 @@
 
 ## 검증 기준
 
-- 배포 후 Deployment Protection이 켜져 있는지 확인한다. 로그아웃 상태의 브라우저로 Production URL을 열어 게이트가 걸리는지 본다.
+- 배포 후 Deployment Protection이 켜져 있는지 확인한다. 로그아웃 상태의 브라우저로 Preview URL을 열어 게이트가 걸리는지 본다.
 - 씨드·DB의 평가 수치가 실제 인사평가 결과가 아닌지 확인한다(이름 자체는 제한하지 않는다).
 - `robots.txt`가 크롤링을 막고 있는지 확인한다.
 - 스키마에 `createdBy`·`updatedBy`·`deletedBy`가 없는지 확인한다(없는 정보를 위한 컬럼 금지).

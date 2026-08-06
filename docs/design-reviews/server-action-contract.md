@@ -250,8 +250,8 @@ type KpiListResult = {
 
 ⑤에서 **애플리케이션 인증을 만들지 않기로 확정했다**(데모 전제 — [auth-demo-scope.md](auth-demo-scope.md)). 대신 두 가지를 지킨다.
 
-- **Vercel Deployment Protection**을 Preview·Production 모두에 켠다. 코드 없이 플랫폼 레벨에서 막는다.
-- **씨드는 가상 인물로만 만든다.** 실제 인사평가 데이터를 넣지 않는다.
+- **Vercel Deployment Protection**으로 막는다. 코드 없이 플랫폼 레벨에서 처리한다. 적용 범위는 [auth-demo-scope.md](auth-demo-scope.md) §1.
+- **평가 수치는 가상값을 쓴다.** 실제 인사평가 결과를 넣지 않는다.
 
 감사 주체가 없으므로 `createdBy`·`updatedBy`·`deletedBy` 컬럼을 만들지 않는다.
 

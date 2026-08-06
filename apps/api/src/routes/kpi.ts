@@ -21,7 +21,7 @@ import {
   listEvaluationAreas,
   listKpiEvaluations,
   updateKpiEvaluation,
-} from '../service'
+} from '../service.js'
 
 export const kpiRoutes = new Hono()
 

@@ -21,7 +21,7 @@ import {
   GRADE_THRESHOLD,
   WEIGHT_TOTAL_BASIS_POINTS,
   type Grade,
-} from './constants'
+} from './constants.js'
 
 export type CalcItem = {
   evaluationArea: string

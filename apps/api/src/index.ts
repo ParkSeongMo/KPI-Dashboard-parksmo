@@ -6,10 +6,10 @@
  * 로컬 실행은 src/dev.ts 가 담당한다.
  */
 
-import './env'
+import './env.js'
 import { Hono } from 'hono'
-import { requireApiKey } from './auth'
-import { kpiRoutes } from './routes/kpi'
+import { requireApiKey } from './auth.js'
+import { kpiRoutes } from './routes/kpi.js'
 
 const app = new Hono()
 

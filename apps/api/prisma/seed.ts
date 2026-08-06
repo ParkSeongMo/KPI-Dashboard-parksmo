@@ -10,7 +10,7 @@
  * 실행: npm run db:seed
  */
 
-import '../src/env'
+import '../src/env.js'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaClient } from '@prisma/client'
 import {

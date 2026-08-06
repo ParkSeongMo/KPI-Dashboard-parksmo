@@ -5,8 +5,8 @@
  * 근거: docs/design-reviews/frontend-backend-split.md
  */
 
-export * from './calc'
-export * from './constants'
-export * from './format'
-export * from './schema'
-export * from './year-options'
+export * from './calc.js'
+export * from './constants.js'
+export * from './format.js'
+export * from './schema.js'
+export * from './year-options.js'

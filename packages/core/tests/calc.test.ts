@@ -17,8 +17,8 @@ import {
   totalAchievementRate,
   weightTotalPercent,
   type CalcItem,
-} from '../src/calc'
-import { formatPercent1, formatScore1, round1 } from '../src/format'
+} from '../src/calc.js'
+import { formatPercent1, formatScore1, round1 } from '../src/format.js'
 
 /** 상세 시안 — 홍길동 / 2026년 하반기. 종합 90.0%, 도넛 개발 70% / 품질 30% */
 const DETAIL_FIXTURE: CalcItem[] = [

@@ -5,7 +5,7 @@
  * 근거: docs/design-reviews/frontend-backend-split.md 「API 계약」
  */
 
-import type { BaseHalfValue } from './constants'
+import type { BaseHalfValue } from './constants.js'
 
 export type KpiListQuery = {
   departmentName?: string

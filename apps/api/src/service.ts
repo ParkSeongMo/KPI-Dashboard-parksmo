@@ -8,7 +8,7 @@
  */
 
 import { Prisma } from '@prisma/client'
-import { prisma } from './db'
+import { prisma } from './db.js'
 import {
   ALIVE,
   PAGE_SIZE,

@@ -9,8 +9,8 @@
  */
 
 import { z } from 'zod'
-import { WEIGHT_TOTAL_BASIS_POINTS } from './constants'
-import { weightBasisPoints } from './calc'
+import { WEIGHT_TOTAL_BASIS_POINTS } from './constants.js'
+import { weightBasisPoints } from './calc.js'
 
 /** 선택 문자열 — 빈 값과 미입력을 같게 본다. */
 const optionalText = (max: number) =>

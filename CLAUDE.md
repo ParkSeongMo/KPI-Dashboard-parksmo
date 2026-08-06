@@ -26,7 +26,7 @@ KPI 관리 대시보드다. 화면은 목록·등록·상세·수정 4개이며 
 - 문서 라우터 → `docs/README.md`
 - 화면 시안 → `docs/image/` (목록, 등록, 상세, 수정)
 - **도메인 규칙·계산식 → `docs/design-reviews/kpi-domain-model.md`** (SSOT)
-- **스택·디렉터리 구조·실행 명령 → `docs/design-reviews/stack-and-structure.md`** (SSOT)
+- **스택·디렉터리 구조·실행 명령·배포 → `docs/design-reviews/stack-and-structure.md`** (SSOT)
 - **모노레포 구조·API 계약·BFF → `docs/design-reviews/frontend-backend-split.md`** (SSOT)
 - **Server Action 계약·검증 스키마·에러 코드 → `docs/design-reviews/server-action-contract.md`** (SSOT)
 - **화면 동작·목록 정렬·빈 상태·접근성 → `docs/design-reviews/screen-behavior.md`** (SSOT)

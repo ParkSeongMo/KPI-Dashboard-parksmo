@@ -202,6 +202,19 @@ datasource db {
 | `npm run db:seed` | ✅ 통과 — 가상 인물 12건(항목 36건). 시안 달성률 10건 전부 일치 |
 | `npm run test:e2e` | ✅ 통과 — Playwright 13개 |
 
+## 배포 (2026-08-06 확정)
+
+Vercel 프로젝트는 2개다. `kpi-api`(Root Directory `apps/api`)와 `kpi-web`(`apps/web`). 모노레포이므로 Root Directory를 앱 디렉터리로 잡아야 한다 — 저장소 루트로 두면 루트 `npm run build`가 워크스페이스 전체를 빌드해 실패한다.
+
+| 대상 | 배포 | 주소 |
+|---|---|---|
+| `kpi-api` | `main` push → Production | `kpi-api-six.vercel.app` |
+| `kpi-web` | **`demo` 브랜치 push → Preview** | `kpi-web-git-demo-<scope>.vercel.app` |
+
+- **`main`은 web을 배포하지 않는다.** Hobby 플랜이 Production에 Deployment Protection을 걸 수 없어(§[auth-demo-scope.md](auth-demo-scope.md) §1) Ignored Build Step으로 production 빌드를 건너뛴다. Production 배포 줄이 `Canceled`로 보이는 것이 정상이다.
+- **데모 갱신**: `git checkout demo && git merge main && git push`. `demo`가 `main`과 같은 SHA면 Vercel이 배포를 건너뛴다.
+- **로그인 없이 열기**: `kpi-web`에 Protection Bypass for Automation을 켜 뒀다. `?x-vercel-protection-bypass=<시크릿>&x-vercel-set-bypass-cookie=true`를 한 번 붙여 들어가면 쿠키가 심어진다. 시크릿은 Vercel 프로젝트 설정에 있다 — **저장소에 넣지 않는다.**
+
 ### shadcn/ui가 Radix가 아니라 Base UI를 쓴다 (2026-08-05 확인)
 
 ②의 의존성 조사에서 놓친 부분이다. 설치된 shadcn은 `@base-ui/react`를 쓰고 Radix를 쓰지 않는다. 실제로 부딪힌 차이:

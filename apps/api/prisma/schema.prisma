@@ -1,0 +1,98 @@
+// KPI 대시보드 데이터 모델
+//
+// 근거 문서 (이 스키마는 아래 결정을 구현한 것이다. 여기서 새 결정을 만들지 않는다):
+//   docs/design-reviews/kpi-domain-model.md      — 필드 정의, 필수/선택
+//   docs/design-reviews/stack-and-structure.md   — Decimal(5,2), 인덱스, sentinel 채택 근거
+//   docs/design-reviews/server-action-contract.md — sentinel deletedAt, unique 제약
+//   docs/design-reviews/auth-demo-scope.md       — 감사 컬럼(createdBy 등)을 두지 않는 이유
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Prisma 7에서는 연결 URL을 스키마에 두지 않는다.
+//   - Migrate가 쓰는 URL      → prisma.config.ts 의 datasource.url  (DIRECT_URL)
+//   - 런타임이 쓰는 URL       → lib/db.ts 에서 Neon 어댑터로 전달   (DATABASE_URL, pooled)
+// Prisma 6의 datasource.url / directUrl 은 제거됐다.
+datasource db {
+  provider = "postgresql"
+}
+
+/// 기준 반기. 시안 라벨은 "기준분기"였지만 값과 표기가 모두 반기여서 반기로 확정했다.
+enum BaseHalf {
+  FIRST // 상반기
+  SECOND // 하반기
+}
+
+/// KPI 평가 1건 = 사원 1명 × 기준 기간 1개
+///
+/// 사원 마스터를 두지 않고 사원 정보를 이 레코드에 직접 저장한다.
+/// 시안의 등록/수정 폼이 다섯 필드를 모두 입력으로 받고, 조직 개편 후에도
+/// 평가 당시 소속이 보존된다.
+model KpiEvaluation {
+  id String @id @default(cuid())
+
+  employeeLoginId String
+  employeeName    String
+  departmentName  String
+  /// 선택 필드. 목록 시안에 팀이 "-"인 행이 있고 등록 폼에도 * 표시가 없다.
+  teamName        String?
+  /// 셀렉트로 입력받는다. 고정 목록은 lib/kpi/constants.ts가 SSOT다.
+  position        String
+
+  baseYear Int
+  baseHalf BaseHalf
+
+  items KpiItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// 소프트 삭제 — sentinel 방식이다.
+  ///
+  /// 살아 있는 행은 EPOCH(1970-01-01)를 공유하므로 아래 @@unique에서 서로 충돌한다.
+  /// 삭제된 행은 각자 다른 삭제 시각을 가지므로 충돌하지 않아 재등록이 가능하다.
+  ///
+  /// nullable + 부분 인덱스(WHERE deletedAt IS NULL)가 더 읽기 좋지만 쓸 수 없다.
+  /// Prisma 7.x는 스키마에 없는 부분 인덱스를 drift로 보고 migrate마다 DROP INDEX를
+  /// 생성한다. Prisma 8이 GA가 되면 되돌리는 것을 재검토한다.
+  deletedAt DateTime @default("1970-01-01T00:00:00Z")
+
+  /// 같은 사원의 같은 기준 기간은 하나만 살아 있을 수 있다.
+  /// deletedAt이 키에 포함되어 있어 삭제 후 재등록은 막지 않는다.
+  @@unique([employeeLoginId, baseYear, baseHalf, deletedAt])
+  @@index([baseYear, baseHalf])
+  @@index([departmentName])
+  @@index([employeeName])
+  @@index([deletedAt])
+}
+
+/// KPI 항목
+model KpiItem {
+  id String @id @default(cuid())
+
+  evaluationId String
+  evaluation   KpiEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  /// 자유 입력. 기존 값 자동완성으로 표기 분화를 완화한다(저장 시 trim).
+  evaluationArea String
+  itemName       String
+  /// 선택 필드
+  metric         String?
+  /// 선택 필드. "분기 5건 이상"처럼 서술형이라 계산에 쓰지 않는 표시용 텍스트다.
+  targetValue    String?
+
+  /// 달성률의 분모. 0을 허용하며, 0이면 목표 미설정으로 보고 달성률을 100%로 계산한다.
+  targetCount   Int
+  /// 목표개수를 초과하는 입력을 허용한다. 달성률만 100%로 상한을 둔다.
+  achievedCount Int    @default(0)
+
+  /// 백분율. 소수 둘째 자리까지 허용해 33.33+33.33+33.34 균등 배분을 가능하게 한다.
+  /// 합 100% 검증은 부동소수로 하지 않고 정수 환산(× 100 → 10000)으로 비교한다.
+  weight Decimal @db.Decimal(5, 2)
+
+  /// 표시 순서. 수정 화면의 순서 이동(↑↓)을 보존한다. 저장 시 서버가 0부터 재부여한다.
+  sortOrder Int
+
+  @@index([evaluationId, sortOrder])
+}

@@ -1,0 +1,30 @@
+{
+  "name": "kpi-dashboard-parksmo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:web": "npm run dev -w @kpi/web",
+    "dev:api": "npm run dev -w @kpi/api",
+    "build": "npm run build -w @kpi/api && npm run build -w @kpi/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:e2e": "playwright test",
+    "db:migrate": "npm run db:migrate -w @kpi/api",
+    "db:deploy": "npm run db:deploy -w @kpi/api",
+    "db:studio": "npm run db:studio -w @kpi/api",
+    "db:seed": "npm run db:seed -w @kpi/api"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.23.7",
+    "typescript": "^5"
+  }
+}

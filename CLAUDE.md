@@ -8,7 +8,7 @@
 
 KPI 관리 대시보드다. 화면은 목록·등록·상세·수정 4개이며 시안이 `docs/image/`에 있다.
 
-**데모 프로젝트다.** 애플리케이션 인증을 만들지 않는다. 접근 제한은 Vercel Deployment Protection으로 처리하고, **씨드 데이터는 가상 인물만 쓴다** — 실제 인사평가 데이터를 넣지 않는다. 근거는 `docs/design-reviews/auth-demo-scope.md`.
+**데모 프로젝트다.** 애플리케이션 인증을 만들지 않는다. 접근 제한은 Vercel Deployment Protection으로 처리한다. **인물은 자유롭게 추가하되 평가 수치는 가상값을 쓴다.** 근거는 `docs/design-reviews/auth-demo-scope.md`.
 
 2026-08-06 기준 **설계 6단계 확정 + 화면 4개 구현 완료 + 프론트/백엔드 분리 완료.**
 

@@ -182,8 +182,9 @@ datasource db {
 }
 ```
 - 런타임은 Neon driver adapter(`@prisma/adapter-neon` + `@neondatabase/serverless`)로 연결한다. 서버리스에서 연결을 재사용하기 위한 구성이며, `lib/db.ts`가 pooled `DATABASE_URL`을 어댑터에 넘긴다.
-- `.env.example`에는 키 이름과 형식만 둔다. 실제 연결 문자열은 커밋하지 않는다. Vercel에서는 Development/Preview/Production 환경변수를 분리한다.
-- **마이그레이션을 빌드에 넣는다 — 단 Neon 네이티브 Vercel 통합을 먼저 설치한 뒤에.** 통합이 preview 배포마다 격리된 DB 브랜치를 만들어 주므로 Preview 빌드가 Production 스키마를 건드리지 않는다. 통합 없이 넣으면 안 된다. 근거는 아래 「의존성 확인 결과」 3번.
+- `.env.example`에는 키 이름과 형식만 둔다. 실제 연결 문자열은 커밋하지 않는다.
+- **DB는 환경 구분 없이 하나를 쓴다(2026-08-06 결정).** 로컬·Preview·Production이 같은 Neon DB를 본다.
+- **마이그레이션은 빌드에 넣지 않는다.** 로컬에서 `npm run db:deploy`로 직접 실행한다.
 
 ## 실행 명령
 
@@ -200,6 +201,19 @@ datasource db {
 | `npx prisma migrate deploy` | ✅ 통과 — `20260805174739_init` 적용. Neon에 테이블 2개 생성 |
 | `npm run db:seed` | ✅ 통과 — 가상 인물 12건(항목 36건). 시안 달성률 10건 전부 일치 |
 | `npm run test:e2e` | ✅ 통과 — Playwright 13개 |
+
+## 배포 (2026-08-06 확정)
+
+Vercel 프로젝트는 2개다. `kpi-api`(Root Directory `apps/api`)와 `kpi-web`(`apps/web`). 모노레포이므로 Root Directory를 앱 디렉터리로 잡아야 한다 — 저장소 루트로 두면 루트 `npm run build`가 워크스페이스 전체를 빌드해 실패한다.
+
+| 대상 | 배포 | 주소 |
+|---|---|---|
+| `kpi-api` | `main` push → Production | `kpi-api-six.vercel.app` |
+| `kpi-web` | **`demo` 브랜치 push → Preview** | `kpi-web-git-demo-<scope>.vercel.app` |
+
+- **`main`은 web을 배포하지 않는다.** Hobby 플랜이 Production에 Deployment Protection을 걸 수 없어(§[auth-demo-scope.md](auth-demo-scope.md) §1) Ignored Build Step으로 production 빌드를 건너뛴다. Production 배포 줄이 `Canceled`로 보이는 것이 정상이다.
+- **데모 갱신**: `git checkout demo && git merge main && git push`. `demo`가 `main`과 같은 SHA면 Vercel이 배포를 건너뛴다.
+- **로그인 없이 열기**: `kpi-web`에 Protection Bypass for Automation을 켜 뒀다. `?x-vercel-protection-bypass=<시크릿>&x-vercel-set-bypass-cookie=true`를 한 번 붙여 들어가면 쿠키가 심어진다. 시크릿은 Vercel 프로젝트 설정에 있다 — **저장소에 넣지 않는다.**
 
 ### shadcn/ui가 Radix가 아니라 Base UI를 쓴다 (2026-08-05 확인)
 
@@ -259,7 +273,7 @@ Context7 MCP가 이번 세션에 로드되지 않아 웹 검색과 공식 문서
 | 3 | Prisma 최신 안정 버전 | 설치된 것은 **7.9.1**. `^7`로 고정해 Prisma 8을 피했다. Prisma 8은 2026-08-02 공개됐지만 **Early Access이며 GA가 아니다** |
 | 4 | Prisma Neon driver adapter | `@prisma/adapter-neon` 사용. **URL 2개(pooled/direct) 구성은 유효하지만 두는 위치가 Prisma 7에서 완전히 바뀌었다** — 아래 「Prisma 7 실제 구성」 참조 |
 | 5 | 부분 unique 인덱스 + migrate drift | **막힌다.** ③의 1순위안을 기각했다(아래) |
-| 6 | Vercel × Neon Preview 브랜치 | Neon 네이티브 Vercel 통합이 **preview 배포마다 DB 브랜치를 자동 생성**하고 사용하지 않는 브랜치를 자동 삭제한다. ②의 미해결 1번 해소 |
+| 6 | Vercel × Neon Preview 브랜치 | Neon 네이티브 Vercel 통합이 **preview 배포마다 DB 브랜치를 자동 생성**하고 사용하지 않는 브랜치를 자동 삭제한다. **도입하지 않는다** — DB를 하나만 쓰기로 했다(2026-08-06) |
 | 7 | shadcn/ui + Tailwind | shadcn CLI가 **Tailwind v4를 지원**한다. `components.json`의 tailwind config 경로는 **빈 값으로 둔다** |
 | 8 | 실제 설치된 버전 | Next `16.3.0`, React `19.2.8`, Tailwind `^4`, ESLint `^9`, Prisma `7.9.1`, **zod `^4`**(v3 아님), Recharts `^3`, react-hook-form `^7`, Vitest `^4`, Playwright `^1.62` |
 | 9 | `AGENTS.md` 자동 생성 | `create-next-app`과 `next dev`가 `AGENTS.md`에 관리 블록을 넣는다. **`AGENTS.md`가 그 블록을 갖고 존재하는 동안 `CLAUDE.md`는 건드리지 않는다**(`node_modules/next/dist/server/lib/generate-agent-files.js` 확인). `AGENTS.md`를 지우면 하네스 `CLAUDE.md`가 덮어써질 수 있으므로 **커밋해서 유지한다** |
@@ -283,13 +297,11 @@ Context7 MCP가 이번 세션에 로드되지 않아 웹 검색과 공식 문서
 - 결론: **Prisma 7.x(최신 7.7.0)에 고정하고, ③의 sentinel 대안을 채택한다.** 부분 인덱스를 쓰지 않으므로 drift 버그를 아예 만나지 않는다. 상세는 [server-action-contract.md](server-action-contract.md)의 「unique 제약 × 소프트 삭제」.
 - Prisma 8이 GA가 되면 partial index + nullable `deletedAt`로 되돌리는 것을 재검토한다. 그때 `@db.*` 제거도 함께 처리한다.
 
-### 확인 결과가 바꾼 것 3 — Preview 브랜치가 확보되므로 마이그레이션을 빌드에 넣을 수 있다
+### 확인 결과가 바꾼 것 3 — 보류. DB를 하나만 쓰기로 했다
 
 ②에서 "Preview와 Production이 같은 DB를 보면 Preview 빌드가 Production 스키마를 바꾼다"며 보류했던 항목이다.
 
-- Neon 네이티브 Vercel 통합이 preview 배포마다 **격리된 DB 브랜치**를 만들고 연결 문자열을 그 배포에만 주입한다. 브랜치는 copy-on-write라 부모 데이터·스키마 복사가 즉시 끝난다.
-- 따라서 통합을 켠 뒤에는 빌드 단계에 `prisma migrate deploy`를 넣어도 Production을 건드리지 않는다.
-- **전제**: 통합을 먼저 설치하고 브랜치 자동 생성·자동 삭제를 켠다. 통합 없이 마이그레이션을 빌드에 넣으면 안 된다.
+Neon 네이티브 Vercel 통합이 preview 배포마다 격리된 DB 브랜치를 만들어 이를 해소할 수 있지만, **2026-08-06에 DB를 하나만 쓰기로 결정해 도입하지 않는다.** 마이그레이션은 빌드에 넣지 않고 `npm run db:deploy`로 직접 실행한다.
 
 ## 출처
 
@@ -330,7 +342,7 @@ Context7 MCP가 이번 세션에 로드되지 않아 웹 검색과 공식 문서
 
 ## 미해결 질문
 
-1. Vercel Preview 환경에 Neon 브랜치를 붙여 Production DB와 분리할 것인가? 분리 여부가 마이그레이션을 빌드에 넣을지를 결정한다.
+1. **해소(2026-08-06)** — DB는 환경 구분 없이 하나를 쓴다. Neon 브랜치를 붙이지 않고, 마이그레이션도 빌드에 넣지 않는다.
 2. 별도 CI(GitHub Actions)에서 `typecheck`/`test`를 돌릴 것인가, Vercel 빌드에만 의존할 것인가?
-3. `.env` 로컬 개발에 Neon을 직접 붙일 것인가, 로컬 Postgres를 쓸 것인가?
+3. **해소(2026-08-06)** — 로컬도 같은 Neon DB를 직접 붙인다(1번과 같은 결정).
 4. ①의 미해결 1·3·4·5·6·7번은 여전히 열려 있다. 1(달성률 100% 초과)과 3(중복 등록)은 ③에서, 4·5·6·7은 ④에서 닫는다.

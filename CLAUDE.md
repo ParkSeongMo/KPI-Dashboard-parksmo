@@ -26,7 +26,7 @@ KPI 관리 대시보드다. 화면은 목록·등록·상세·수정 4개이며 
 - 문서 라우터 → `docs/README.md`
 - 화면 시안 → `docs/image/` (목록, 등록, 상세, 수정)
 - **도메인 규칙·계산식 → `docs/design-reviews/kpi-domain-model.md`** (SSOT)
-- **스택·디렉터리 구조·실행 명령 → `docs/design-reviews/stack-and-structure.md`** (SSOT)
+- **스택·디렉터리 구조·실행 명령·배포 → `docs/design-reviews/stack-and-structure.md`** (SSOT)
 - **모노레포 구조·API 계약·BFF → `docs/design-reviews/frontend-backend-split.md`** (SSOT)
 - **Server Action 계약·검증 스키마·에러 코드 → `docs/design-reviews/server-action-contract.md`** (SSOT)
 - **화면 동작·목록 정렬·빈 상태·접근성 → `docs/design-reviews/screen-behavior.md`** (SSOT)
@@ -36,7 +36,7 @@ KPI 관리 대시보드다. 화면은 목록·등록·상세·수정 4개이며 
 - 리뷰 체크리스트 → 아직 없음. 리뷰 기준이 굳어진 뒤 `/docs-organize`로 만든다
 - 아키텍처 메모 → 아직 없음. 코드 도입 후 `/code-to-docs`로 만든다
 - 하네스 결정 → `.claude/notes/harness-decisions.md`
-- skill 추천 결과 → 외부 후보 비교 또는 프로젝트 전용 custom skill 채택/보류 근거가 필요할 때만 `docs/skill-recommendations.md` (현재 미생성)
+- skill 추천 결과 → `docs/skill-recommendations.md`
 
 > 기존 `README`, `docs/`가 있으면 그 문서를 SSOT로 유지하고 여기서는 경로만 인용한다. 규칙 본문을 중복 복제하지 않는다.
 

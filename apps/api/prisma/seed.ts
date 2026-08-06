@@ -1,8 +1,9 @@
 /**
  * 데모용 씨드 데이터.
  *
- * 시안(docs/image/목록.png)의 12건을 재현한다. **전부 가상 인물이다.**
- * 실제 인사평가 데이터를 넣지 않는다(docs/design-reviews/auth-demo-scope.md).
+ * 시안(docs/image/목록.png)의 12건에 `박성모` 1건을 더한 13건이다.
+ * 인물에는 제한을 두지 않되 평가 수치는 가상값을 쓴다
+ * (docs/design-reviews/auth-demo-scope.md).
  *
  * 각 평가의 항목 수치는 계산 결과가 시안의 종합 달성률과 일치하도록 역산했다.
  * 홍길동 건은 상세 시안(docs/image/상세.png)의 값을 그대로 쓴다.
@@ -56,6 +57,22 @@ function devItems(a1: number, a2: number, a3: number, t3 = 10): SeedItem[] {
 
 const EVALUATIONS: SeedEvaluation[] = [
   // ── 2026 하반기 ──────────────────────────────────────────────
+  {
+    // 항목 9개 · 가중치 20/20/10/5/10/10/5/10/10 = 100. 목표개수 0 항목(크래시율)은 달성률 100%로 본다.
+    loginId: 'parksmo', name: '박성모', department: '서비스플랫폼사업부', team: 'iOS팀', position: '책임',
+    year: 2026, half: 'SECOND', expectedRate: 86.3,
+    items: [
+      { area: '제품/개발 성과', name: '기능 개발 일정 준수', metric: '개발 항목별 스프린트/마일스톤 단위로 측정', targetValue: '95%', target: 100, achieved: 90, weight: 20 },
+      { area: '제품/개발 성과', name: '릴리즈 일정 준수율', metric: '계획일 ±1일 이내 릴리즈 완료 건수', targetValue: '95%', target: 1, achieved: 1, weight: 20 },
+      { area: '기술 품질', name: '단위 테스트 커버리지', metric: '신규 비즈니스 로직 Unit Test Coverage', targetValue: '70%', target: 1, achieved: 1, weight: 10 },
+      { area: '기술 품질', name: '담당 기능 크래시율', metric: 'Crash Rate, Crash-Free Users, Critical Crash 건수 0건', targetValue: '100%', target: 0, achieved: 0, weight: 5 },
+      { area: '기술 품질', name: '이슈 해결율', metric: '이슈 등록 후 1주일 이내 해결률', targetValue: '100%', target: 100, achieved: 100, weight: 10 },
+      { area: '아키텍처 개선', name: 'Legacy code 개선', metric: '프로젝트 당 Legacy code 개선 모듈 수 3건', targetValue: '100%', target: 3, achieved: 1, weight: 10 },
+      { area: '아키텍처 개선', name: '신규 아키텍처 적용', metric: '신규 프로젝트에 신규 아키텍처 적용률', targetValue: '100%', target: 1, achieved: 1, weight: 5 },
+      { area: '아키텍처 개선', name: '공통 모듈 설계', metric: '공통 모듈 설계 및 개발 건수 2건', targetValue: '100%', target: 2, achieved: 1, weight: 10 },
+      { area: '조직 기여', name: '주니어 개발자를 위한 멘토링', metric: '월 단위 기술 멘토링 수 2회', targetValue: '100%', target: 2, achieved: 2, weight: 10 },
+    ],
+  },
   {
     loginId: 'lee.mh', name: '이명희', department: '개발본부', team: '서비스팀', position: '책임',
     year: 2026, half: 'SECOND', expectedRate: 60.0, items: devItems(6, 6, 6),
@@ -121,6 +138,7 @@ const EVALUATIONS: SeedEvaluation[] = [
     year: 2026, half: 'FIRST', expectedRate: 85.5, items: devItems(9, 9, 75, 100),
   },
   // ── 2페이지용 2건 (시안의 `총 12건`을 맞춘다) ────────────────
+  // 박성모 1건이 더해져 실제 씨드는 13건이다.
   {
     loginId: 'seo.jh', name: '서지훈', department: '영업본부', team: '영업1팀', position: '선임',
     year: 2026, half: 'FIRST', expectedRate: 68.0,
